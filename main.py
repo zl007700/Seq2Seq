@@ -11,7 +11,8 @@ model   = Seq2SeqModel(args)
 if args.mode == 'train':
     print('trainging')
     train_set = dataset.getDatas('train')
-    model.train(train_set)
+    eval_set = dataset.getDatas('eval')
+    model.train(train_set, eval_set)
 elif args.mode == 'eval':
     print('evaluation')
     eval_set = dataset.getDatas('eval')

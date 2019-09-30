@@ -61,7 +61,7 @@ class Seq2SeqModel(object):
         bs = self.args.batch_size
 
         for epoch_id in range(self.args.epoch):
-            for i in tqdm.tqdm(range(sample_num//bs+1)):
+            for i in tqdm.tqdm(range(sample_num//bs)):
                 _, loss_val, all_summary, global_step_val = sess.run( [self.train_op, self.loss, self.summaries, self.global_step],
                     feed_dict={
                         self.x: train_x[(i*bs):(i*bs+bs)],
@@ -97,23 +97,22 @@ class Seq2SeqModel(object):
 
         eval_x, eval_y, eval_x_len, eval_y_len = test_set
         sample_num = eval_x.shape[0]
-        #bs = self.args.batch_size
-        bs = 1
+        bs = self.args.batch_size
 
-        #for i in tqdm.tqdm(range(sample_num//bs+1)):
-        for i in tqdm.tqdm(range(10)):
-            prediction_val = sess.run(
-                self.beam_decoder_result_ids,
+        loss_total = 0
+        for i in tqdm.tqdm(range(sample_num//bs)):
+            loss_val = sess.run(
+                self.loss,
                 feed_dict={
                     self.x: eval_x[(i*bs):(i*bs+bs)],
                     self.x_len: eval_x_len[(i*bs):(i*bs+bs)],
+                    self.y: eval_y[(i*bs):(i*bs+bs)],
+                    self.y_len: eval_y_len[(i*bs):(i*bs+bs)],
                 }
             )
-            ground_truth = eval_y[(i*bs):(i*bs+bs)].tolist()
-
-            print('GROUND TRUE', ground_truth[0])
-            print('PREDICTION', prediction_val)
-
+            loss_total += loss_val
+        loss_total /= (sample_num//bs)
+        print('Eval loss is : ', loss_total)
 
     def freeze(self):
         from tensorflow.python.framework import graph_util
