@@ -241,22 +241,23 @@ class Seq2SeqModel(object):
 
         ## Encoder
         with tf.name_scope('encoder'):
-            ## BiLSTM
-            lstm_fw_cell = tf.nn.rnn_cell.LSTMCell(H, forget_bias=1.0, state_is_tuple=True)
-            lstm_bw_cell = tf.nn.rnn_cell.LSTMCell(H, forget_bias=1.0, state_is_tuple=True)
-            (output_fw, output_bw), (state_fw, state_bw) = tf.nn.bidirectional_dynamic_rnn(lstm_fw_cell, 
-                                                    lstm_bw_cell, 
+            ## Multi-BiLSTM
+            fw_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(num_units=H) for i in range(self.args.layer_size)])
+            bw_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(num_units=H) for i in range(self.args.layer_size)])
+            bi_encoder_output, bi_encoder_state = tf.nn.bidirectional_dynamic_rnn(
+                                                    fw_cell,
+                                                    bw_cell,
                                                     e_x,
                                                     sequence_length=x_len,
                                                     dtype=tf.float32,
                                                     time_major=False,
                                                     scope=None)
-            encoder_output = output_fw  + output_bw
-            encoder_final_state = state_fw[0] + state_bw[0]
+            encoder_output = bi_encoder_output[0] + bi_encoder_output[1]
+            encoder_final_state = bi_encoder_state[0]
 
         ## Decoder
         with tf.name_scope('decoder'):
-            decoder_cell = rnn.GRUCell(num_units = H)
+            decoder_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(num_units=H) for i in range(self.args.layer_size)])
             decoder_lengths = tf.ones(shape=[batch_size], dtype=tf.int32) * (T_out + 1)
 
             ## Trainning decoder
@@ -267,7 +268,7 @@ class Seq2SeqModel(object):
                                                      name = 'attention_fn')
             projection_layer = Dense(units = D_out, kernel_initializer = xavier_initializer())
 
-            train_decoder_cell = AttentionWrapper(cell=decoder_cell, attention_mechanism=attention_mechanism, attention_layer_size=None)
+            train_decoder_cell = AttentionWrapper(cell=decoder_cell, attention_mechanism=attention_mechanism, attention_layer_size=H)
             train_decoder_init_state = train_decoder_cell.zero_state(batch_size=batch_size, dtype=tf.float32).clone(cell_state=encoder_final_state)
             training_helper = TrainingHelper(e_y, decoder_lengths, time_major=False)
             train_decoder = BasicDecoder(cell=train_decoder_cell,
