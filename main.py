@@ -5,8 +5,8 @@ from model import Seq2SeqModel
 from dataset import Seq2SeqDataset
 
 args    = loadConfig('config.ini')
-model   = Seq2SeqModel(args)
 dataset = Seq2SeqDataset(args)
+model   = Seq2SeqModel(args)
 
 if args.mode == 'train':
     print('trainging')

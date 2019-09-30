@@ -32,7 +32,7 @@ class Seq2SeqDataset(object):
 
     def __init__(self, args):
         self.args = args
-        self.ftk = FullTokenizer(self.args.vocab_file, chinese_word_seg=True)
+        self.ftk = FullTokenizer(self.args.vocab_file, chinese_word_seg=self.args.chinese_word_seg)
         dir_path = os.path.dirname(__file__)
         self.corpus_file_path = os.path.join(dir_path, self.args.data_path, 'corpus.txt') 
         self.train_file_path  = os.path.join(dir_path, self.args.build_path, 'train.txt') 
@@ -55,7 +55,8 @@ class Seq2SeqDataset(object):
             train_num = int(len(datas) * 0.8)
             eval_num = len(datas) - train_num
 
-            random.shuffle(datas)
+            if self.args.shuffle:
+                random.shuffle(datas)
 
             with open(self.train_file_path, 'w') as fout:
                 for data in datas[:train_num]:
@@ -99,10 +100,13 @@ class Seq2SeqDataset(object):
         data_x_len = np.array(texts_A_len).astype(np.int32)
         data_y_len = np.array(texts_B_len).astype(np.int32)
         
-        print(data_x[:2])
-        print(data_x_len[:2])
-        print(data_y[:2])
+        print(data_x_len[:1])
         print(self.ftk.convert_ids_to_tokens(data_x[0]))
+        print(data_x[:1])
+
+        print(data_y_len[:1])
+        print(self.ftk.convert_ids_to_tokens(data_y[0]))
+        print(data_y[:1])
 
         data_x.tofile(output_x_file)
         data_y.tofile(output_y_file)
