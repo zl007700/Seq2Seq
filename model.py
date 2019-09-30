@@ -134,6 +134,22 @@ class Seq2SeqModel(object):
 
         print('Freezing Done')
 
+    def predict(self, x, x_len, sess=None):
+        if not sess:
+            sess = tf.Session()
+            dir_path = os.path.dirname(__file__)
+            self.model_path= os.path.join(dir_path, self.args.model_path)
+            saver = tf.train.Saver()
+            saver.restore(sess, tf.train.latest_checkpoint(self.model_path))
+        beam_ids = sess.run(
+            self.beam_decoder_result_ids,
+            feed_dict={
+                self.x: [x],
+                self.x_len: [x_len],
+            }
+        )
+        return beam_ids[0][:,0]
+
     def infer(self, infer_set):
         dir_path = os.path.dirname(__file__)
         self.model_path= os.path.join(dir_path, self.args.model_path)

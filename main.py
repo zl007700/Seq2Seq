@@ -17,6 +17,12 @@ elif args.mode == 'eval':
     print('evaluation')
     eval_set = dataset.getDatas('eval')
     model.eval(eval_set)
+elif args.mode == 'predict':
+    print('prediction')
+    eval_set = dataset.getDatas('eval')
+    print(dataset.ftk.convert_ids_to_tokens(eval_set[0][0]))
+    pred_id = model.predict(eval_set[0][0], eval_set[2][0])
+    print(dataset.ftk.convert_ids_to_tokens(pred_id))
 elif args.mode == 'freeze':
     print('evaluation')
     model.freeze()
