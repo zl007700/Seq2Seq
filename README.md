@@ -2,7 +2,7 @@
 
 Simple tensorflow implementation of Seq2Seq framework. 
 
-We build this porject for three reason.
+We build this porject for three reasons.
 
 + Easy to use and run.
 + Easy to change for new task.
@@ -41,7 +41,7 @@ question3\tanswer3
        .
        .
 ```
-Correspondingly you need to change *vocab.txt* in this path.
+Correspondingly you need to change *vocab.txt* in this path and input output sentence length in config.ini.
 
 
 **2. Trainning**
@@ -75,7 +75,7 @@ python3 main.py --mode train --restore=1
 ```
 
 
-## TDOO
+## TODO
 + Finish framework building and setup a demo result.
 + Testing on Pretrained Wordvector
 + Add Bert encoding.
