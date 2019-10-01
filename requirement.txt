@@ -1,0 +1,4 @@
+jieba>=0.39
+tensorflow>=1.12.0
+numpy==1.16.4
+tqdm>=4.28.1
