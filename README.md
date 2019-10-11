@@ -12,6 +12,7 @@ We build this porject for three reasons.
 ## Testing enviroment
 
 Python3
+tensorflow 1.12.0
 
 **Install requirement**
 
@@ -77,7 +78,8 @@ python3 main.py --mode train --restore=1
 
 ## TODO
 + Finish framework building and setup a demo result.
-+ Testing on Pretrained Wordvector
++ Testing on Pretrained Wordvector.
++ Change from to Tensorflow 2.0.
 + Add Bert encoding.
  
  
